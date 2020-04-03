@@ -37,14 +37,13 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 	},
 	data() {
 		return {
+			validateManager: new ValidateManager(),
 			isValid: false,
 		};
 	},
 	created() {
-		const validateManager = new ValidateManager();
-		this.validateManager = validateManager;
-		this[VALIDATE_MANAGER_SYMBOL] = validateManager;
-		this.subscription = validateManager.observable$().subscribe({
+		this[VALIDATE_MANAGER_SYMBOL] = this.validateManager;
+		this.subscription = this.validateManager.observable$().subscribe({
 			next: (v: boolean) => {
 				this.isValid = !!v;
 			},
