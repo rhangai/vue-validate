@@ -1,13 +1,16 @@
 import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
 import { map } from "rxjs/operators";
 import {
-	FormComponentValidate,
-	FormComponentValidateOptions,
-} from "./FormComponentValidate";
+	ValidateComponent,
+	ValidateComponentOptions,
+} from "./ValidateComponent";
 
-export class FormManager {
+/**
+ * Manage the validation state of a group of components
+ */
+export class ValidateManager {
 	private readonly state$ = new BehaviorSubject(false);
-	private readonly map = new Map<Vue, FormComponentValidate>();
+	private readonly map = new Map<Vue, ValidateComponent>();
 	private subscription: Subscription | null = null;
 
 	observable$() {
@@ -29,8 +32,13 @@ export class FormManager {
 		await Promise.all(promises);
 	}
 
-	create(component: Vue, options: FormComponentValidateOptions) {
-		const componentValidate = new FormComponentValidate(
+	/**
+	 * Create a new ValidateComponent
+	 * @param component
+	 * @param options
+	 */
+	create(component: Vue, options: ValidateComponentOptions) {
+		const componentValidate = new ValidateComponent(
 			this,
 			component,
 			options
@@ -41,7 +49,7 @@ export class FormManager {
 	}
 
 	/**
-	 * Remove o componente da validação
+	 * Removes the component from validation
 	 * @param component
 	 */
 	remove(component: Vue) {
@@ -49,6 +57,7 @@ export class FormManager {
 		this.refreshSubscription();
 	}
 
+	// Refresh the subscription every time this form changes
 	private refreshSubscription() {
 		if (this.subscription) {
 			this.subscription.unsubscribe();

@@ -1,5 +1,5 @@
 {
-  "name": "@rhangai/vue-form",
+  "name": "@rhangai/vue-validate",
   "version": "0.0.0",
   "description": "Validation Forms",
   "main": "lib/index.js",
@@ -10,15 +10,21 @@
     "@rollup/plugin-commonjs": "^11.0.2",
     "@rollup/plugin-node-resolve": "^7.1.1",
     "@rollup/plugin-typescript": "^4.0.0",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
     "rollup": "^2.3.2",
     "rxjs": "^6.5.5",
+    "tslib": "^1.11.1",
     "typescript": "^3.8.3",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^8.4.1"
   },
   "scripts": {
+    "clean": "rimraf lib",
     "build:rollup": "rollup -c",
-    "build:tsc": "tsc --emitDeclarationOnly"
+    "build:tsc": "tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build": "run-s clean build:rollup build:tsc",
+    "prepare": "run-s build"
   }
 }

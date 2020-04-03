@@ -1,5 +1,5 @@
 import { VueConstructor } from "vue";
 
-export const FormPlugin = {
+export const VueValidate = {
 	install(vue: VueConstructor) {},
 };

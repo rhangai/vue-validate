@@ -1,9 +1,9 @@
 /* eslint 'no-useless-constructor': 'off' */
 import Vue from "vue";
 import { Observable, BehaviorSubject, Subscription } from "rxjs";
-import { FormManager } from "./FormManager";
+import { ValidateManager } from "./ValidateManager";
 
-export type FormComponentValidateOptions = {
+export type ValidateComponentOptions = {
 	/// Limpa o estado do observável
 	reset: (component: Vue) => unknown | Promise<unknown>;
 	/// Valida o observável
@@ -12,14 +12,17 @@ export type FormComponentValidateOptions = {
 	state$: (component: Vue) => Observable<boolean>;
 };
 
-export class FormComponentValidate {
+/**
+ * Validates each field
+ */
+export class ValidateComponent {
 	private readonly subscription: Subscription;
 	private readonly state$ = new BehaviorSubject(false);
 
 	constructor(
-		private readonly formManager: FormManager,
+		private readonly ValidateManager: ValidateManager,
 		private readonly component: Vue,
-		private readonly options: FormComponentValidateOptions
+		private readonly options: ValidateComponentOptions
 	) {
 		this.destroy = this.destroy.bind(this);
 		this.component.$once("hook:beforeDestroy", this.destroy);
@@ -43,7 +46,7 @@ export class FormComponentValidate {
 
 	destroy() {
 		this.subscription.unsubscribe();
-		this.formManager.remove(this.component);
+		this.ValidateManager.remove(this.component);
 		this.component.$off("hook:beforeDestroy", this.destroy);
 	}
 }

@@ -1,23 +1,24 @@
 import Vue, { ComponentOptions } from "vue";
 import { Observable } from "rxjs";
-import { FormManager } from "./FormManager";
-import { FormComponentValidate } from "./FormComponentValidate";
-import { FORM_SYMBOL } from "./Form";
+import { ValidateManager } from "./manager/ValidateManager";
+import { ValidateComponent } from "./manager/ValidateComponent";
+import { VALIDATE_MANAGER_SYMBOL } from "./ValidateProvider";
 
-export interface IFormField extends Vue {
+export interface IValidateField extends Vue {
 	readonly isValid: boolean;
 }
 
-interface FormFieldComponent extends Vue, IFormField {
-	$formComponent: FormComponentValidate | null;
-	formManager: FormManager;
+interface ValidateFieldMixinComponent extends Vue, IValidateField {
+	$formComponent: ValidateComponent | null;
+	ValidateManager: ValidateManager;
 	isDirty: boolean;
 }
 
-export const FormFieldMixin: ComponentOptions<Vue> = {
+export const ValidateFieldMixin: ComponentOptions<Vue> &
+	ThisType<ValidateFieldMixinComponent> = {
 	inject: {
-		formManager: {
-			from: FORM_SYMBOL,
+		ValidateManager: {
+			from: VALIDATE_MANAGER_SYMBOL,
 			default: () => null,
 		},
 	},
@@ -27,14 +28,14 @@ export const FormFieldMixin: ComponentOptions<Vue> = {
 		};
 	},
 	watch: {
-		formManager: {
+		ValidateManager: {
 			immediate: true,
-			handler(this: FormFieldComponent) {
+			handler() {
 				if (this.$formComponent) {
 					this.$formComponent.destroy();
 					this.$formComponent = null;
 				}
-				this.$formComponent = this.formManager.create(this, {
+				this.$formComponent = this.ValidateManager.create(this, {
 					reset: () => {
 						this.isDirty = false;
 					},

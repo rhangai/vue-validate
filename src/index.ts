@@ -1,2 +1,3 @@
-export { Form } from "./Form";
-export { FormFieldMixin } from "./FormFieldMixin";
+export { VueValidate } from "./ValidatePlugin";
+export { ValidateProvider } from "./ValidateProvider";
+export { ValidateFieldMixin } from "./ValidateFieldMixin";

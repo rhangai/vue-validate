@@ -6,7 +6,7 @@ export default {
 	input: "src/index.ts",
 	output: {
 		dir: "lib",
-		format: "commonjs",
+		format: "es",
 	},
 	external: ["vue", "rxjs", "rxjs/operators"],
 	plugins: [typescript(), resolve(), commonjs()],
