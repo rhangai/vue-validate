@@ -9,7 +9,7 @@ import {
  * Manage the validation state of a group of components
  */
 export class ValidateManager {
-	private readonly state$ = new BehaviorSubject(false);
+	private readonly state$ = new BehaviorSubject(true);
 	private readonly map = new Map<Vue, ValidateComponent>();
 	private subscription: Subscription | null = null;
 
@@ -66,6 +66,10 @@ export class ValidateManager {
 
 		const validators: Observable<boolean>[] = [];
 		this.map.forEach((v) => validators.push(v.observable$()));
+		if (validators.length <= 0) {
+			this.state$.next(true);
+			return;
+		}
 
 		// Faz a inscrição
 		this.subscription = combineLatest(...validators)
