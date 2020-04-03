@@ -5,4 +5,4 @@ export {
 } from "./manager/ValidateManager";
 export { ValidateProvider } from "./ValidateProvider";
 export { ValidateFieldMixin } from "./ValidateFieldMixin";
-export { ValidateDirectiveRules } from "./directive/ValidateDirectiveRules";
+export * from "./directive";
