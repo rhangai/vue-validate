@@ -21,7 +21,7 @@ export class ValidateComponent {
 
 	constructor(
 		private readonly ValidateManager: ValidateManager,
-		private readonly component: Vue,
+		public readonly component: Vue,
 		private readonly options: ValidateComponentOptions
 	) {
 		this.destroy = this.destroy.bind(this);

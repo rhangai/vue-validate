@@ -1,34 +1,55 @@
 import { DirectiveOptions } from "vue/types/options";
 import { ValidateManager } from "../manager/ValidateManager";
-import { BehaviorSubject, Observable, combineLatest } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest, Subscription } from "rxjs";
 import { map } from "rxjs/operators";
 import { ValidateRulesManager } from "../rules/ValidateRulesManager";
 import { ValidateComponent } from "../manager/ValidateComponent";
+import { watchAsObservable } from "../util";
 
 class ValidateDirectiveVuelidateManager {
 	private vuelidate: any;
-	private rulesManager = new ValidateRulesManager();
+	private state$ = new BehaviorSubject(false);
+	private vuelidateSubscription: Subscription | null = null;
 	private validateComponent: ValidateComponent | null;
 
 	constructor(component: Vue | undefined | null) {
 		this.validateComponent = ValidateManager.create(component, {
 			reset: this.reset.bind(this),
 			validate: this.validate.bind(this),
-			state$: (component: Vue) =>
-				this.rulesManager.fromComponent$(component),
+			state$: () => this.state$,
 		});
 	}
 
 	destroy() {
+		if (this.vuelidateSubscription) {
+			this.vuelidateSubscription.unsubscribe();
+			this.vuelidateSubscription = null;
+		}
 		this.validateComponent?.destroy();
 	}
 
 	setBinding(binding: any) {
-		console.log("Updating");
 		if (this.vuelidate !== binding.value) {
 			this.vuelidate = binding.value;
-			this.rulesManager.setRules(vuelidateRules(binding.value));
+			this.refreshSubscription();
 		}
+	}
+
+	private refreshSubscription() {
+		if (this.vuelidateSubscription) {
+			this.vuelidateSubscription.unsubscribe();
+			this.vuelidateSubscription = null;
+		}
+
+		if (!this.vuelidate || !this.validateComponent) return;
+
+		const component = this.validateComponent.component;
+		const vuelidateObservable = watchAsObservable(
+			component,
+			() => !this.vuelidate.$invalid,
+			{ immediate: true }
+		);
+		this.vuelidateSubscription = vuelidateObservable.subscribe(this.state$);
 	}
 
 	validate() {
@@ -42,7 +63,6 @@ class ValidateDirectiveVuelidateManager {
 
 export const ValidateDirectiveVuelidate: DirectiveOptions = {
 	bind(el: any, binding, vnode) {
-		const dirty$ = new BehaviorSubject(false);
 		const manager = new ValidateDirectiveVuelidateManager(
 			vnode.componentInstance
 		);
@@ -56,13 +76,3 @@ export const ValidateDirectiveVuelidate: DirectiveOptions = {
 		el.validateDirectiveManager?.destroy();
 	},
 };
-
-function vuelidateRules(vuelidate: any) {
-	if (!vuelidate) return null;
-	return [
-		() => {
-			if (vuelidate.$invalid) return false;
-			return true;
-		},
-	];
-}
