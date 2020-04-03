@@ -10,14 +10,14 @@ export interface IValidateField extends Vue {
 
 interface ValidateFieldMixinComponent extends Vue, IValidateField {
 	$formComponent: ValidateComponent | null;
-	ValidateManager: ValidateManager;
+	validateManager: ValidateManager;
 	isDirty: boolean;
 }
 
 export const ValidateFieldMixin: ComponentOptions<Vue> &
 	ThisType<ValidateFieldMixinComponent> = {
 	inject: {
-		ValidateManager: {
+		validateManager: {
 			from: VALIDATE_MANAGER_SYMBOL,
 			default: () => null,
 		},
@@ -28,14 +28,15 @@ export const ValidateFieldMixin: ComponentOptions<Vue> &
 		};
 	},
 	watch: {
-		ValidateManager: {
+		validateManager: {
 			immediate: true,
 			handler() {
 				if (this.$formComponent) {
 					this.$formComponent.destroy();
 					this.$formComponent = null;
 				}
-				this.$formComponent = this.ValidateManager.create(this, {
+				if (!this.validateManager) return;
+				this.$formComponent = this.validateManager.create(this, {
 					reset: () => {
 						this.isDirty = false;
 					},

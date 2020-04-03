@@ -8,9 +8,12 @@ export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
 interface ValidateProviderVue extends Vue {
 	isValid: boolean;
 	[VALIDATE_MANAGER_SYMBOL]: ValidateManager;
-	ValidateManager: ValidateManager;
+	validateManager: ValidateManager;
+	parentValidateManager: ValidateManager | null;
 	parentFormComponent: ValidateComponent | null;
 	subscription: Subscription;
+
+	refreshParentValidateManager(): void;
 }
 
 export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
@@ -23,7 +26,7 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 	},
 	provide() {
 		return {
-			[VALIDATE_MANAGER_SYMBOL]: this.ValidateManager,
+			[VALIDATE_MANAGER_SYMBOL]: this.validateManager,
 		};
 	},
 	inject: {
@@ -38,17 +41,32 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 		};
 	},
 	created() {
-		this.ValidateManager = this[
-			VALIDATE_MANAGER_SYMBOL
-		] = new ValidateManager();
-		this.subscription = this.ValidateManager.observable$().subscribe({
+		const validateManager = new ValidateManager();
+		this.validateManager = validateManager;
+		this[VALIDATE_MANAGER_SYMBOL] = validateManager;
+		this.subscription = validateManager.observable$().subscribe({
 			next: (v: boolean) => {
 				this.isValid = !!v;
 			},
 		});
+		this.refreshParentValidateManager();
 	},
 	beforeDestroy() {
 		this.subscription.unsubscribe();
+	},
+	methods: {
+		refreshParentValidateManager() {
+			if (this.parentFormComponent) {
+				this.parentFormComponent.destroy();
+				this.parentFormComponent = null;
+			}
+			if (!this.parentValidateManager || !this.validateManager) return;
+			this.parentFormComponent = this.parentValidateManager.create(this, {
+				reset: () => this.validateManager.reset(),
+				validate: () => this.validateManager.validate(),
+				state$: () => this.validateManager.observable$(),
+			});
+		},
 	},
 	watch: {
 		isValid() {
@@ -57,16 +75,7 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 		parentValidateManager: {
 			immediate: true,
 			handler(manager: ValidateManager) {
-				if (this.parentFormComponent) {
-					this.parentFormComponent.destroy();
-					this.parentFormComponent = null;
-				}
-				if (!manager) return;
-				this.parentFormComponent = manager.create(this, {
-					reset: () => this.ValidateManager.reset(),
-					validate: () => this.ValidateManager.validate(),
-					state$: () => this.ValidateManager.observable$(),
-				});
+				this.refreshParentValidateManager();
 			},
 		},
 	},
