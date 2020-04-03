@@ -24,6 +24,7 @@ class ValidateDirectiveVuelidateManager {
 	}
 
 	setBinding(binding: any) {
+		console.log("Updating");
 		if (this.vuelidate !== binding.value) {
 			this.vuelidate = binding.value;
 			this.rulesManager.setRules(vuelidateRules(binding.value));

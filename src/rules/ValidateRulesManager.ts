@@ -1,11 +1,9 @@
 import { BehaviorSubject, Subject, combineLatest, Observable } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import { switchMap, map } from "rxjs/operators";
 
 export type ValidateRuleResult = boolean | string;
 
-export type ValidateRule = (
-	value: any
-) => ValidateRuleResult | Promise<ValidateRuleResult>;
+export type ValidateRule = (value: any) => ValidateRuleResult;
 
 export class ValidateRulesManager {
 	private rules$: BehaviorSubject<ValidateRule[] | null>;
@@ -29,8 +27,8 @@ export class ValidateRulesManager {
 			};
 		});
 		return combineLatest([this.rules$, value$]).pipe(
-			switchMap(([rules, value]) => {
-				if (!rules) return Promise.resolve(true);
+			map(([rules, value]) => {
+				if (!rules) return true;
 				return ValidateRulesManager.applyRules(rules, value);
 			})
 		);
@@ -45,14 +43,11 @@ export class ValidateRulesManager {
 		this.rules$.next([].concat(rules).filter(Boolean));
 	}
 
-	static async applyRules(
-		rules: ValidateRule[],
-		value: any
-	): Promise<boolean> {
+	static applyRules(rules: ValidateRule[], value: any): boolean {
 		try {
 			for (let i = 0; i < rules.length; ++i) {
-				const isValid = await rules[i].call(null, value);
-				if (!isValid) return false;
+				const isValid = rules[i].call(null, value);
+				if (isValid === false) return false;
 			}
 			return true;
 		} catch (err) {
