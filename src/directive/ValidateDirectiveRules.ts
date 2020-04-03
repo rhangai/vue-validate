@@ -1,19 +1,26 @@
 import { DirectiveOptions } from "vue/types/options";
+import { ValidateManager } from "../manager/ValidateManager";
+import { BehaviorSubject } from "rxjs";
 
 export const ValidateDirectiveRules: DirectiveOptions = {
-	bind(el, binding, vnode) {
-		console.log("BIND", vnode);
-		console.log(vnode.context);
-		console.log(vnode.componentInstance);
+	bind(el: any, binding, vnode) {
+		const isDirty$ = new BehaviorSubject(false);
+		const component = vnode.componentInstance;
+		el.validateComponent = ValidateManager.create(component, {
+			reset() {
+				isDirty$.next(false);
+			},
+			validate() {
+				isDirty$.next(true);
+			},
+			state$() {
+				return isDirty$.asObservable();
+			},
+		});
 	},
-	update(el, binding, vnode) {
-		console.log("UPDATED", vnode);
-		console.log(vnode.context);
-		console.log(vnode.componentInstance);
-	},
-	unbind(el, binding, vnode) {
-		console.log("UBIND", vnode);
-		console.log(vnode.context);
-		console.log(vnode.componentInstance);
+	unbind(el: any, binding, vnode) {
+		if (el.validateComponent) {
+			el.validateComponent.destroy();
+		}
 	},
 };

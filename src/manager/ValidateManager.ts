@@ -4,6 +4,7 @@ import {
 	ValidateComponent,
 	ValidateComponentOptions,
 } from "./ValidateComponent";
+import { VALIDATE_MANAGER_SYMBOL } from "../ValidateProvider";
 
 /**
  * Manage the validation state of a group of components
@@ -37,7 +38,10 @@ export class ValidateManager {
 	 * @param component
 	 * @param options
 	 */
-	create(component: Vue, options: ValidateComponentOptions) {
+	create(
+		component: Vue,
+		options: ValidateComponentOptions
+	): ValidateComponent {
 		const componentValidate = new ValidateComponent(
 			this,
 			component,
@@ -78,5 +82,30 @@ export class ValidateManager {
 				map((values) => !values.includes(false))
 			)
 			.subscribe(this.state$);
+	}
+
+	/**
+	 *
+	 */
+	static create(
+		component: Vue | null | undefined,
+		options: ValidateComponentOptions
+	): ValidateComponent | null {
+		const validateManager = this.findManager(component);
+		if (!validateManager) return null;
+		return validateManager.create(component!, options);
+	}
+
+	static findManager(
+		component: Vue | null | undefined
+	): ValidateManager | null {
+		let currentComponent = component;
+		while (currentComponent != null) {
+			// @ts-ignore
+			const validateManager = currentComponent[VALIDATE_MANAGER_SYMBOL];
+			if (validateManager) return validateManager;
+			currentComponent = currentComponent.$parent;
+		}
+		return null;
 	}
 }
