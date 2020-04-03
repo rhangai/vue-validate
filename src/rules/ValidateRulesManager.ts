@@ -30,19 +30,33 @@ export class ValidateRulesManager {
 		});
 		return combineLatest([this.rules$, value$]).pipe(
 			switchMap(([rules, value]) => {
+				if (!rules) return Promise.resolve(true);
 				return ValidateRulesManager.applyRules(rules, value);
 			})
 		);
 	}
 
-	setRules(rules: ValidateRule[]) {
-		this.rules$.next(rules);
+	setRules(rules: ValidateRule[] | ValidateRule | null) {
+		if (!rules) {
+			this.rules$.next(null);
+			return;
+		}
+		// @ts-ignore
+		this.rules$.next([].concat(rules).filter(Boolean));
 	}
 
 	static async applyRules(
-		rules: ValidateRule[] | null,
+		rules: ValidateRule[],
 		value: any
 	): Promise<boolean> {
-		return false;
+		try {
+			for (let i = 0; i < rules.length; ++i) {
+				const isValid = await rules[i].call(null, value);
+				if (!isValid) return false;
+			}
+			return true;
+		} catch (err) {
+			return false;
+		}
 	}
 }
