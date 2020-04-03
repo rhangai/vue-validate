@@ -1,8 +1,10 @@
 import Vue, { ComponentOptions } from "vue";
 import { Observable } from "rxjs";
-import { ValidateManager } from "./manager/ValidateManager";
+import {
+	ValidateManager,
+	VALIDATE_MANAGER_SYMBOL,
+} from "./manager/ValidateManager";
 import { ValidateComponent } from "./manager/ValidateComponent";
-import { VALIDATE_MANAGER_SYMBOL } from "./ValidateProvider";
 
 export interface IValidateField extends Vue {
 	readonly isValid: boolean;

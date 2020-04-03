@@ -1,9 +1,10 @@
 import Vue, { ComponentOptions } from "vue";
 import { Subscription } from "rxjs";
-import { ValidateManager } from "./manager/ValidateManager";
+import {
+	ValidateManager,
+	VALIDATE_MANAGER_SYMBOL,
+} from "./manager/ValidateManager";
 import { ValidateComponent } from "./manager/ValidateComponent";
-
-export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
 
 interface ValidateProviderVue extends Vue {
 	isValid: boolean;

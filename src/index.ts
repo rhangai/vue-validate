@@ -1,5 +1,8 @@
 export { VueValidate } from "./ValidatePlugin";
-export { ValidateManager } from "./manager/ValidateManager";
-export { ValidateProvider, VALIDATE_MANAGER_SYMBOL } from "./ValidateProvider";
+export {
+	ValidateManager,
+	VALIDATE_MANAGER_SYMBOL,
+} from "./manager/ValidateManager";
+export { ValidateProvider } from "./ValidateProvider";
 export { ValidateFieldMixin } from "./ValidateFieldMixin";
 export { ValidateDirectiveRules } from "./directive/ValidateDirectiveRules";

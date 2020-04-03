@@ -4,7 +4,7 @@ import {
 	ValidateComponent,
 	ValidateComponentOptions,
 } from "./ValidateComponent";
-import { VALIDATE_MANAGER_SYMBOL } from "../ValidateProvider";
+export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
 
 /**
  * Manage the validation state of a group of components
