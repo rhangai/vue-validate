@@ -26,7 +26,7 @@ export const ValidateDirectiveVuelidate: DirectiveOptions = {
 					dirty$,
 				]).pipe(
 					map(([isValid, isDirty]) => {
-						if (!isDirty) return false;
+						// if (!isDirty) return true;
 						return !isValid;
 					})
 				);
