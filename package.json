@@ -1,0 +1,24 @@
+{
+  "name": "@rhangai/vue-form",
+  "version": "0.0.0",
+  "description": "Validation Forms",
+  "main": "lib/index.js",
+  "author": "rhangai <hangai.renan@gmail.com>",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^11.0.2",
+    "@rollup/plugin-node-resolve": "^7.1.1",
+    "@rollup/plugin-typescript": "^4.0.0",
+    "rollup": "^2.3.2",
+    "rxjs": "^6.5.5",
+    "typescript": "^3.8.3",
+    "vue": "^2.6.11",
+    "vue-class-component": "^7.2.3",
+    "vue-property-decorator": "^8.4.1"
+  },
+  "scripts": {
+    "build:rollup": "rollup -c",
+    "build:tsc": "tsc --emitDeclarationOnly"
+  }
+}
