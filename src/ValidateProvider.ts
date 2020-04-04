@@ -46,7 +46,9 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 		this[VALIDATE_MANAGER_SYMBOL] = this.validateManager;
 		this.subscription = this.validateManager.observable$().subscribe({
 			next: (v: boolean) => {
-				this.isValid = !!v;
+				this.$nextTick(() => {
+					this.isValid = !!v;
+				});
 			},
 		});
 		this.refreshParentValidateManager();

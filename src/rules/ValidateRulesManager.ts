@@ -1,5 +1,10 @@
-import { BehaviorSubject, Subject, combineLatest, Observable } from "rxjs";
-import { switchMap, map } from "rxjs/operators";
+import {
+	BehaviorSubject,
+	combineLatest,
+	Observable,
+	asyncScheduler,
+} from "rxjs";
+import { watchAsObservable } from "../util";
 
 export type ValidateRuleResult = boolean | string;
 
@@ -13,24 +18,16 @@ export class ValidateRulesManager {
 	}
 
 	fromComponent$(component: Vue): Observable<boolean> {
-		const value$ = new Observable<any>((subscriber) => {
-			const unwatch = component.$watch(
-				// @ts-ignore
-				() => component.value,
-				(value) => {
-					subscriber.next(value);
-				},
-				{ immediate: true }
-			);
-			return () => {
-				unwatch();
-			};
+		const value$ = watchAsObservable(component, "value", {
+			immediate: true,
 		});
-		return combineLatest([this.rules$, value$]).pipe(
-			map(([rules, value]) => {
+		return combineLatest(
+			[this.rules$, value$],
+			(rules, value) => {
 				if (!rules) return true;
 				return ValidateRulesManager.applyRules(rules, value);
-			})
+			},
+			asyncScheduler
 		);
 	}
 

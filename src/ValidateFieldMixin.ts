@@ -5,6 +5,7 @@ import {
 	VALIDATE_MANAGER_SYMBOL,
 } from "./manager/ValidateManager";
 import { ValidateComponent } from "./manager/ValidateComponent";
+import { watchAsObservable } from "./util";
 
 export interface IValidateField extends Vue {
 	readonly isValid: boolean;
@@ -46,23 +47,16 @@ export const ValidateFieldMixin: ComponentOptions<Vue> &
 						this.isDirty = true;
 					},
 					state$: () => {
-						return new Observable<boolean>((subscriber) => {
-							const unwatch = this.$watch(
-								() => {
-									if (!this.isDirty) return true;
-									return this.isValid;
-								},
-								(isValid) => {
-									subscriber.next(!!isValid);
-								},
-								{
-									immediate: true,
-								}
-							);
-							return () => {
-								unwatch();
-							};
-						});
+						return watchAsObservable(
+							this,
+							() => {
+								if (!this.isDirty) return true;
+								return !!this.isValid;
+							},
+							{
+								immediate: true,
+							}
+						);
 					},
 				});
 			},
