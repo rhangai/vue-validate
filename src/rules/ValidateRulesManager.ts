@@ -11,10 +11,10 @@ export type ValidateRuleResult = boolean | string;
 export type ValidateRule = (value: any) => ValidateRuleResult;
 
 export class ValidateRulesManager {
-	private rules$: BehaviorSubject<ValidateRule[] | null>;
+	private rules$: BehaviorSubject<ValidateRule[]>;
 
 	constructor(rules: ValidateRule[] | null = null) {
-		this.rules$ = new BehaviorSubject<ValidateRule[] | null>(rules);
+		this.rules$ = new BehaviorSubject<ValidateRule[]>(rules || []);
 	}
 
 	fromComponent$(component: Vue): Observable<boolean> {
@@ -25,7 +25,12 @@ export class ValidateRulesManager {
 			[this.rules$, value$],
 			(rules, value) => {
 				if (!rules) return true;
-				return ValidateRulesManager.applyRules(rules, value);
+				const result = ValidateRulesManager.doValidateRules(
+					value,
+					rules
+				);
+				if (result === false || Array.isArray(result)) return false;
+				return true;
 			},
 			asyncScheduler
 		);
@@ -33,18 +38,32 @@ export class ValidateRulesManager {
 
 	setRules(rules: ValidateRule[] | ValidateRule | null) {
 		if (!rules) {
-			this.rules$.next(null);
+			this.rules$.next([]);
 			return;
 		}
 		// @ts-ignore
 		this.rules$.next([].concat(rules).filter(Boolean));
 	}
 
-	static applyRules(rules: ValidateRule[], value: any): boolean {
+	static validateRules(
+		value: any,
+		rules: ValidateRule[] | ValidateRule | null
+	): Array<string> | boolean {
+		if (!rules) return true;
+		if (!Array.isArray(rules)) rules = [rules];
+		return ValidateRulesManager.doValidateRules(value, rules);
+	}
+
+	private static doValidateRules(
+		value: any,
+		rules: ValidateRule[]
+	): Array<string> | boolean {
 		try {
+			const errors: string[] = [];
 			for (let i = 0; i < rules.length; ++i) {
 				const isValid = rules[i].call(null, value);
 				if (isValid === false) return false;
+				else if (typeof isValid === "string") return [isValid];
 			}
 			return true;
 		} catch (err) {

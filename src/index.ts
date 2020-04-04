@@ -6,3 +6,4 @@ export {
 export { ValidateProvider } from "./ValidateProvider";
 export { ValidateFieldMixin } from "./ValidateFieldMixin";
 export * from "./directive";
+export * from "./rules";
