@@ -44,7 +44,7 @@ export class ValidateManager {
 	 * @param component
 	 * @param options
 	 */
-	create(component: Vue, options: ValidateItemOptions): ValidateItem {
+	createItem(component: Vue, options: ValidateItemOptions): ValidateItem {
 		const componentValidate = new ValidateItem(this, component, options);
 		this.map.set(component, componentValidate);
 		this.refreshSubscription();
@@ -75,26 +75,25 @@ export class ValidateManager {
 		}
 
 		// Faz a inscrição
-		this.subscription = combineLatest(...validators)
-			.pipe(
-				// Mapeia
-				map((values) => !values.includes(false))
-			)
-			.subscribe(this.state$);
+		this.subscription = combineLatest(
+			...validators,
+			(values) => !values.includes(false)
+		).subscribe(this.state$);
 	}
 
 	/**
-	 *
+	 * Create a new item on the component
 	 */
-	static create(
+	static createItem(
 		component: Vue | null | undefined,
 		options: ValidateItemOptions
 	): ValidateItem | null {
 		const validateManager = this.findManager(component);
 		if (!validateManager) return null;
-		return validateManager.create(component!, options);
+		return validateManager.createItem(component!, options);
 	}
 
+	/// Find the manager on the component
 	static findManager(
 		component: Vue | null | undefined
 	): ValidateManager | null {

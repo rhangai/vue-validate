@@ -20,7 +20,7 @@ export class ValidateItem {
 	private readonly state$ = new BehaviorSubject(false);
 
 	constructor(
-		private readonly ValidateManager: ValidateManager,
+		private readonly validateManager: ValidateManager,
 		public readonly component: Vue,
 		private readonly options: ValidateItemOptions
 	) {
@@ -46,7 +46,7 @@ export class ValidateItem {
 
 	destroy() {
 		this.subscription.unsubscribe();
-		this.ValidateManager.remove(this.component);
+		this.validateManager.remove(this.component);
 		this.component.$off("hook:beforeDestroy", this.destroy);
 	}
 }

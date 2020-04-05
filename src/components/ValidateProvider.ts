@@ -3,15 +3,15 @@ import { Subscription } from "rxjs";
 import {
 	ValidateManager,
 	VALIDATE_MANAGER_SYMBOL,
-} from "./manager/ValidateManager";
-import { ValidateItem } from "./manager/ValidateItem";
+} from "../manager/ValidateManager";
+import { ValidateItem } from "../manager/ValidateItem";
 
 interface ValidateProviderVue extends Vue {
 	isValid: boolean;
 	[VALIDATE_MANAGER_SYMBOL]: ValidateManager;
 	validateManager: ValidateManager;
 	parentValidateManager: ValidateManager | null;
-	parentFormComponent: ValidateItem | null;
+	parentValidateItem: ValidateItem | null;
 	subscription: Subscription;
 
 	refreshParentValidateManager(): void;
@@ -58,16 +58,19 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 	},
 	methods: {
 		refreshParentValidateManager() {
-			if (this.parentFormComponent) {
-				this.parentFormComponent.destroy();
-				this.parentFormComponent = null;
+			if (this.parentValidateItem) {
+				this.parentValidateItem.destroy();
+				this.parentValidateItem = null;
 			}
 			if (!this.parentValidateManager || !this.validateManager) return;
-			this.parentFormComponent = this.parentValidateManager.create(this, {
-				reset: () => this.validateManager.reset(),
-				validate: () => this.validateManager.validate(),
-				state$: () => this.validateManager.observable$(),
-			});
+			this.parentValidateItem = this.parentValidateManager.createItem(
+				this,
+				{
+					reset: () => this.validateManager.reset(),
+					validate: () => this.validateManager.validate(),
+					state$: () => this.validateManager.observable$(),
+				}
+			);
 		},
 	},
 	watch: {

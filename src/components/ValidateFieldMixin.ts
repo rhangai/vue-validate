@@ -12,7 +12,7 @@ export interface IValidateField extends Vue {
 }
 
 interface ValidateFieldMixinComponent extends Vue, IValidateField {
-	$formComponent: ValidateItem | null;
+	$validateItem: ValidateItem | null;
 	validateManager: ValidateManager;
 	isDirty: boolean;
 }
@@ -34,12 +34,12 @@ export const ValidateFieldMixin: ComponentOptions<Vue> &
 		validateManager: {
 			immediate: true,
 			handler() {
-				if (this.$formComponent) {
-					this.$formComponent.destroy();
-					this.$formComponent = null;
+				if (this.$validateItem) {
+					this.$validateItem.destroy();
+					this.$validateItem = null;
 				}
 				if (!this.validateManager) return;
-				this.$formComponent = this.validateManager.create(this, {
+				this.$validateItem = this.validateManager.createItem(this, {
 					reset: () => {
 						this.isDirty = false;
 					},
