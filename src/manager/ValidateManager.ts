@@ -1,9 +1,6 @@
 import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
 import { map } from "rxjs/operators";
-import {
-	ValidateComponent,
-	ValidateComponentOptions,
-} from "./ValidateComponent";
+import { ValidateItem, ValidateItemOptions } from "./ValidateItem";
 export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
 
 /**
@@ -11,13 +8,19 @@ export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
  */
 export class ValidateManager {
 	private readonly state$ = new BehaviorSubject(true);
-	private readonly map = new Map<Vue, ValidateComponent>();
+	private readonly map = new Map<Vue, ValidateItem>();
 	private subscription: Subscription | null = null;
 
+	/**
+	 * Get the state as an observable.
+	 */
 	observable$() {
 		return this.state$.asObservable();
 	}
 
+	/**
+	 * Validate every item from the manager
+	 */
 	async validate(): Promise<boolean> {
 		const validators: Promise<boolean>[] = [];
 		this.map.forEach((v) =>
@@ -27,6 +30,9 @@ export class ValidateManager {
 		return !isValid.includes(false);
 	}
 
+	/**
+	 * Reset every item form the manager
+	 */
 	async reset(): Promise<void> {
 		const promises: Promise<void | null>[] = [];
 		this.map.forEach((v) => promises.push(v.reset().catch(() => null)));
@@ -34,19 +40,12 @@ export class ValidateManager {
 	}
 
 	/**
-	 * Create a new ValidateComponent
+	 * Create a new ValidateItem
 	 * @param component
 	 * @param options
 	 */
-	create(
-		component: Vue,
-		options: ValidateComponentOptions
-	): ValidateComponent {
-		const componentValidate = new ValidateComponent(
-			this,
-			component,
-			options
-		);
+	create(component: Vue, options: ValidateItemOptions): ValidateItem {
+		const componentValidate = new ValidateItem(this, component, options);
 		this.map.set(component, componentValidate);
 		this.refreshSubscription();
 		return componentValidate;
@@ -89,8 +88,8 @@ export class ValidateManager {
 	 */
 	static create(
 		component: Vue | null | undefined,
-		options: ValidateComponentOptions
-	): ValidateComponent | null {
+		options: ValidateItemOptions
+	): ValidateItem | null {
 		const validateManager = this.findManager(component);
 		if (!validateManager) return null;
 		return validateManager.create(component!, options);

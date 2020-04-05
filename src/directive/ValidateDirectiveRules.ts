@@ -2,15 +2,15 @@ import { DirectiveOptions } from "vue/types/options";
 import { ValidateManager } from "../manager/ValidateManager";
 import { BehaviorSubject } from "rxjs";
 import { ValidateRulesManager } from "../rules/ValidateRulesManager";
-import { ValidateComponent } from "../manager/ValidateComponent";
+import { ValidateItem } from "../manager/ValidateItem";
 
 class ValidateDirectiveRulesManager {
 	private rulesManager: ValidateRulesManager;
-	private validateComponent: ValidateComponent | null;
+	private ValidateItem: ValidateItem | null;
 
 	constructor(component: Vue | undefined | null, binding: any) {
 		this.rulesManager = new ValidateRulesManager(binding.value);
-		this.validateComponent = ValidateManager.create(component, {
+		this.ValidateItem = ValidateManager.create(component, {
 			reset() {},
 			validate() {},
 			state$: (component: Vue) => {
@@ -24,7 +24,7 @@ class ValidateDirectiveRulesManager {
 	}
 
 	destroy() {
-		this.validateComponent?.destroy();
+		this.ValidateItem?.destroy();
 	}
 }
 

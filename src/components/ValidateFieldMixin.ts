@@ -3,16 +3,16 @@ import { Observable } from "rxjs";
 import {
 	ValidateManager,
 	VALIDATE_MANAGER_SYMBOL,
-} from "./manager/ValidateManager";
-import { ValidateComponent } from "./manager/ValidateComponent";
-import { watchAsObservable } from "./util";
+} from "../manager/ValidateManager";
+import { ValidateItem } from "../manager/ValidateItem";
+import { watchAsObservable } from "../util";
 
 export interface IValidateField extends Vue {
 	readonly isValid: boolean;
 }
 
 interface ValidateFieldMixinComponent extends Vue, IValidateField {
-	$formComponent: ValidateComponent | null;
+	$formComponent: ValidateItem | null;
 	validateManager: ValidateManager;
 	isDirty: boolean;
 }
@@ -49,7 +49,7 @@ export const ValidateFieldMixin: ComponentOptions<Vue> &
 					state$: () => {
 						return watchAsObservable(
 							this,
-							() => {
+							function () {
 								if (!this.isDirty) return true;
 								return !!this.isValid;
 							},

@@ -4,14 +4,14 @@ import {
 	ValidateManager,
 	VALIDATE_MANAGER_SYMBOL,
 } from "./manager/ValidateManager";
-import { ValidateComponent } from "./manager/ValidateComponent";
+import { ValidateItem } from "./manager/ValidateItem";
 
 interface ValidateProviderVue extends Vue {
 	isValid: boolean;
 	[VALIDATE_MANAGER_SYMBOL]: ValidateManager;
 	validateManager: ValidateManager;
 	parentValidateManager: ValidateManager | null;
-	parentFormComponent: ValidateComponent | null;
+	parentFormComponent: ValidateItem | null;
 	subscription: Subscription;
 
 	refreshParentValidateManager(): void;

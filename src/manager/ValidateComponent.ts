@@ -3,7 +3,7 @@ import Vue from "vue";
 import { Observable, BehaviorSubject, Subscription } from "rxjs";
 import { ValidateManager } from "./ValidateManager";
 
-export type ValidateComponentOptions = {
+export type ValidateItemOptions = {
 	/// Limpa o estado do observável
 	reset: (component: Vue) => unknown | Promise<unknown>;
 	/// Valida o observável
@@ -15,14 +15,14 @@ export type ValidateComponentOptions = {
 /**
  * Validates each field
  */
-export class ValidateComponent {
+export class ValidateItem {
 	private readonly subscription: Subscription;
 	private readonly state$ = new BehaviorSubject(false);
 
 	constructor(
 		private readonly ValidateManager: ValidateManager,
 		public readonly component: Vue,
-		private readonly options: ValidateComponentOptions
+		private readonly options: ValidateItemOptions
 	) {
 		this.destroy = this.destroy.bind(this);
 		this.component.$once("hook:beforeDestroy", this.destroy);
