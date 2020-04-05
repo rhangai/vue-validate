@@ -39,6 +39,15 @@ export class ValidateManager {
 		await Promise.all(promises);
 	}
 
+	destroy() {
+		const items: ValidateItem[] = [];
+		this.map.forEach((v) => items.push(v));
+		this.map.clear();
+
+		this.subscription?.unsubscribe();
+		items.forEach((v) => v.destroy());
+	}
+
 	/**
 	 * Create a new ValidateItem
 	 * @param component
@@ -56,8 +65,7 @@ export class ValidateManager {
 	 * @param component
 	 */
 	remove(component: Vue) {
-		this.map.delete(component);
-		this.refreshSubscription();
+		if (this.map.delete(component)) this.refreshSubscription();
 	}
 
 	// Refresh the subscription every time this form changes

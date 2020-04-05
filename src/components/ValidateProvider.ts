@@ -8,8 +8,8 @@ import { ValidateItem } from "../manager/ValidateItem";
 
 interface ValidateProviderVue extends Vue {
 	isValid: boolean;
-	[VALIDATE_MANAGER_SYMBOL]: ValidateManager;
 	validateManager: ValidateManager;
+	[VALIDATE_MANAGER_SYMBOL]: ValidateManager;
 	parentValidateManager: ValidateManager | null;
 	parentValidateItem: ValidateItem | null;
 	subscription: Subscription;
@@ -74,12 +74,15 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 		},
 	},
 	watch: {
-		isValid() {
-			this.$emit("input", this.isValid);
+		isValid: {
+			immediate: true,
+			handler() {
+				this.$emit("input", this.isValid);
+			},
 		},
 		parentValidateManager: {
 			immediate: true,
-			handler(manager: ValidateManager) {
+			handler() {
 				this.refreshParentValidateManager();
 			},
 		},
