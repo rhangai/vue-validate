@@ -14,7 +14,7 @@ interface ValidateProviderVue extends Vue {
 	parentValidateItem: ValidateItem | null;
 	subscription: Subscription;
 
-	refreshParentValidateManager(): void;
+	parentValidateManagerRefresh(): void;
 }
 
 export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
@@ -51,13 +51,13 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 				});
 			},
 		});
-		this.refreshParentValidateManager();
+		this.parentValidateManagerRefresh();
 	},
 	beforeDestroy() {
 		this.subscription.unsubscribe();
 	},
 	methods: {
-		refreshParentValidateManager() {
+		parentValidateManagerRefresh() {
 			if (this.parentValidateItem) {
 				this.parentValidateItem.destroy();
 				this.parentValidateItem = null;
@@ -83,7 +83,7 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 		parentValidateManager: {
 			immediate: true,
 			handler() {
-				this.refreshParentValidateManager();
+				this.parentValidateManagerRefresh();
 			},
 		},
 	},
