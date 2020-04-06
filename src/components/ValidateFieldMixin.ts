@@ -1,5 +1,4 @@
 import Vue, { ComponentOptions } from "vue";
-import { Observable } from "rxjs";
 import {
 	ValidateManager,
 	VALIDATE_MANAGER_SYMBOL,

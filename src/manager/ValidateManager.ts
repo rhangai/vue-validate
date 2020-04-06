@@ -1,5 +1,4 @@
 import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
-import { map } from "rxjs/operators";
 import { ValidateItem, ValidateItemOptions } from "./ValidateItem";
 export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
 
