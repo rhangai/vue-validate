@@ -1,4 +1,4 @@
-import { BehaviorSubject, combineLatest, Observable, fromEvent, merge, of } from "rxjs";
+import { BehaviorSubject, combineLatest, Observable, fromEvent, merge, of, empty } from "rxjs";
 import { watchAsObservable } from "../util";
 
 export type ValidateRuleResult = boolean | string;
@@ -25,11 +25,7 @@ export class ValidateRulesManager {
 	}
 
 	fromElement$(element: HTMLElement): Observable<boolean> {
-		const value$ = merge(
-			// @ts-ignore
-			of(element.value),
-			fromEvent(element, "input", (event) => event.target.value)
-		);
+		const value$ = ValidateRulesManager.elementValue$(element);
 		return combineLatest([this.rules$, value$], (rules, value) => {
 			if (!rules) return true;
 			const result = ValidateRulesManager.doValidateRules(value, rules);
@@ -42,7 +38,7 @@ export class ValidateRulesManager {
 		this.rules$.next(this.normalizeRules(rules));
 	}
 
-	normalizeRules(rules: ValidateRule[] | ValidateRule | null): ValidateRule[] {
+	private normalizeRules(rules: ValidateRule[] | ValidateRule | null): ValidateRule[] {
 		if (!rules) {
 			return [];
 		}
@@ -68,5 +64,22 @@ export class ValidateRulesManager {
 		} catch (err) {
 			return false;
 		}
+	}
+
+	private static elementValue$(element: HTMLElement): Observable<any> {
+		let propName = "value";
+		let eventName = "input";
+		if (element.tagName === "INPUT") {
+			const inputType = (element.getAttribute("type") || "text").toLowerCase();
+			if (inputType === "checkbox") {
+				propName = "checked";
+				eventName = "change";
+			}
+		}
+		return merge(
+			// @ts-ignore
+			of(element[propName]),
+			fromEvent(element, eventName, (event) => event.target[propName])
+		);
 	}
 }
