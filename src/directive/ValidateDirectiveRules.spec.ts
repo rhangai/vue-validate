@@ -97,6 +97,7 @@ describe("ValidateDirectiveRules", () => {
 		wrapper.get({ ref: "input" }).setValue("Some text");
 		await wrapper.vm.$nextTick();
 
+		await validateProvider.vm.reset();
 		await expect(validateProvider.vm.validate()).resolves.toBe(false);
 		await expect(childValidateProvider.vm.validate()).resolves.toBe(true);
 

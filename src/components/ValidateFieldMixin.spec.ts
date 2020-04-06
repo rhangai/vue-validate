@@ -47,6 +47,7 @@ describe("ValidateFieldMixin", () => {
 		wrapper.get("input").setValue("Some text");
 		await wrapper.vm.$nextTick();
 
+		await validateProvider.vm.reset();
 		await expect(validateProvider.vm.validate()).resolves.toBe(true);
 
 		wrapper.destroy();
