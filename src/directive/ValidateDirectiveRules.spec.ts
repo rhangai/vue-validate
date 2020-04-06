@@ -9,7 +9,7 @@ interface TestInput extends Vue {
 }
 
 describe("ValidateDirectiveRules", () => {
-	it("should allow rules", async () => {
+	it("should allow rules on elements", async () => {
 		const TestWrapper = Vue.extend({
 			components: {
 				ValidateProvider,
@@ -42,6 +42,54 @@ describe("ValidateDirectiveRules", () => {
 		wrapper.get("input").setValue("Some text");
 		await wrapper.vm.$nextTick();
 
+		await validateProvider.vm.reset();
+		await expect(validateProvider.vm.validate()).resolves.toBe(true);
+
+		wrapper.destroy();
+	});
+
+	it("should allow rules on components", async () => {
+		const TestInput = Vue.extend({
+			data: () => ({
+				value: "",
+			}),
+			template: `
+				<input type="text" v-model="value" >
+			`,
+		});
+
+		const TestWrapper = Vue.extend({
+			components: {
+				ValidateProvider,
+				TestInput,
+			},
+			directives: {
+				rules: ValidateDirectiveRules,
+			},
+			data: () => ({
+				value: "",
+			}),
+			methods: {
+				required(v: any) {
+					return !!v;
+				},
+			},
+			template: `
+				<validate-provider ref="parent">
+					<test-input v-rules="required" />
+				</validate-provider>
+			`,
+		});
+
+		const wrapper = mount(TestWrapper);
+		const validateProvider = wrapper.get(ValidateProvider);
+
+		await expect(validateProvider.vm.validate()).resolves.toBe(false);
+
+		wrapper.get("input").setValue("Some text");
+		await wrapper.vm.$nextTick();
+
+		await validateProvider.vm.reset();
 		await expect(validateProvider.vm.validate()).resolves.toBe(true);
 
 		wrapper.destroy();
