@@ -1,6 +1,7 @@
 
 # build
 /lib
+/coverage
 
 # vendor
 node_modules
