@@ -6,14 +6,18 @@ import {
 } from "../manager/ValidateManager";
 import { ValidateItem } from "../manager/ValidateItem";
 
-interface ValidateProviderVue extends Vue {
+export interface ValidateProvider extends Vue {
+	validate(): Promise<boolean>;
+	reset(): Promise<void>;
+}
+
+export interface ValidateProviderVue extends Vue, ValidateProvider {
 	isValid: boolean;
 	validateManager: ValidateManager;
 	[VALIDATE_MANAGER_SYMBOL]: ValidateManager;
 	parentValidateManager: ValidateManager | null;
 	parentValidateItem: ValidateItem | null;
 	subscription: Subscription;
-
 	parentValidateManagerRefresh(): void;
 }
 
@@ -54,9 +58,16 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 		this.parentValidateManagerRefresh();
 	},
 	beforeDestroy() {
+		this.validateManager.destroy();
 		this.subscription.unsubscribe();
 	},
 	methods: {
+		validate() {
+			return this.validateManager.validate();
+		},
+		reset() {
+			return this.validateManager.reset();
+		},
 		parentValidateManagerRefresh() {
 			if (this.parentValidateItem) {
 				this.parentValidateItem.destroy();
