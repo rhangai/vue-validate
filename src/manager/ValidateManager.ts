@@ -67,7 +67,7 @@ export class ValidateManager {
 	 * Removes the component from validation
 	 * @param component
 	 */
-	remove(component: Vue) {
+	removeItem(component: Vue) {
 		if (this.map.delete(component)) this.refreshSubscription();
 	}
 

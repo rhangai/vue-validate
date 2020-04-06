@@ -46,7 +46,7 @@ export class ValidateItem {
 
 	destroy() {
 		this.subscription.unsubscribe();
-		this.validateManager.remove(this.component);
+		this.validateManager.removeItem(this.component);
 		this.component.$off("hook:beforeDestroy", this.destroy);
 	}
 }
