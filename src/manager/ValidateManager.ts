@@ -39,6 +39,9 @@ export class ValidateManager {
 		await Promise.all(promises);
 	}
 
+	/**
+	 * Destroy the validate manager.
+	 */
 	destroy() {
 		const items: ValidateItem[] = [];
 		this.map.forEach((v) => items.push(v));
