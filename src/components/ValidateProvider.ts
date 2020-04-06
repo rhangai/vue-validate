@@ -1,9 +1,6 @@
 import Vue, { ComponentOptions } from "vue";
 import { Subscription } from "rxjs";
-import {
-	ValidateManager,
-	VALIDATE_MANAGER_SYMBOL,
-} from "../manager/ValidateManager";
+import { ValidateManager, VALIDATE_MANAGER_SYMBOL } from "../manager/ValidateManager";
 import { ValidateItem } from "../manager/ValidateItem";
 
 export interface ValidateProvider extends Vue {
@@ -21,8 +18,7 @@ export interface ValidateProviderVue extends Vue, ValidateProvider {
 	parentValidateManagerRefresh(): void;
 }
 
-export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
-	ThisType<ValidateProviderVue> = {
+export const ValidateProvider: ComponentOptions<ValidateProviderVue> & ThisType<ValidateProviderVue> = {
 	props: {
 		value: {
 			type: Boolean,
@@ -43,19 +39,16 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 	data() {
 		return {
 			validateManager: new ValidateManager(),
-			isValid: false,
+			isValid: true,
 		};
 	},
 	created() {
 		this[VALIDATE_MANAGER_SYMBOL] = this.validateManager;
 		this.subscription = this.validateManager.observable$().subscribe({
 			next: (v: boolean) => {
-				this.$nextTick(() => {
-					this.isValid = !!v;
-				});
+				this.isValid = !!v;
 			},
 		});
-		this.parentValidateManagerRefresh();
 	},
 	beforeDestroy() {
 		this.validateManager.destroy();
@@ -74,15 +67,11 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 				this.parentValidateItem = null;
 			}
 			if (!this.parentValidateManager || !this.validateManager) return;
-			this.parentValidateItem = this.parentValidateManager.createItem(
-				this,
-				this,
-				{
-					reset: () => this.validateManager.reset(),
-					validate: () => this.validateManager.validate(),
-					state$: () => this.validateManager.observable$(),
-				}
-			);
+			this.parentValidateItem = this.parentValidateManager.createItem(this, this, {
+				reset: () => this.validateManager.reset(),
+				validate: () => this.validateManager.validate(),
+				state$: () => this.validateManager.observable$(),
+			});
 		},
 	},
 	watch: {

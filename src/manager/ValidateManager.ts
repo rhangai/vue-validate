@@ -1,9 +1,5 @@
 import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
-import {
-	ValidateItem,
-	ValidateItemOptions,
-	ValidateItemKey,
-} from "./ValidateItem";
+import { ValidateItem, ValidateItemOptions, ValidateItemKey } from "./ValidateItem";
 export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
 
 /**
@@ -26,9 +22,7 @@ export class ValidateManager {
 	 */
 	async validate(): Promise<boolean> {
 		const validators: Promise<boolean>[] = [];
-		this.map.forEach((v) =>
-			validators.push(v.validate().catch(() => false))
-		);
+		this.map.forEach((v) => validators.push(v.validate().catch(() => false)));
 		const isValid = await Promise.all(validators);
 		return !isValid.includes(false);
 	}
@@ -59,17 +53,8 @@ export class ValidateManager {
 	 * @param component
 	 * @param options
 	 */
-	createItem(
-		key: ValidateItemKey,
-		component: Vue,
-		options: ValidateItemOptions
-	): ValidateItem {
-		const componentValidate = new ValidateItem(
-			this,
-			key,
-			component,
-			options
-		);
+	createItem(key: ValidateItemKey, component: Vue, options: ValidateItemOptions): ValidateItem {
+		const componentValidate = new ValidateItem(this, key, component, options);
 		this.map.set(key, componentValidate);
 		this.refreshSubscription();
 		return componentValidate;
@@ -98,9 +83,8 @@ export class ValidateManager {
 		}
 
 		// Faz a inscrição
-		this.subscription = combineLatest(
-			...validators,
-			(values) => !values.includes(false)
-		).subscribe(this.state$);
+		this.subscription = combineLatest(...validators, (...values: boolean[]) => {
+			return !values.includes(false);
+		}).subscribe(this.state$);
 	}
 }

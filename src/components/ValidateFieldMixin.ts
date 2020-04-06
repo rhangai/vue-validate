@@ -1,8 +1,5 @@
 import Vue, { ComponentOptions } from "vue";
-import {
-	ValidateManager,
-	VALIDATE_MANAGER_SYMBOL,
-} from "../manager/ValidateManager";
+import { ValidateManager, VALIDATE_MANAGER_SYMBOL } from "../manager/ValidateManager";
 import { ValidateItem } from "../manager/ValidateItem";
 import { watchAsObservable } from "../util";
 
@@ -16,8 +13,7 @@ interface ValidateFieldMixinComponent extends Vue, IValidateField {
 	dirty: boolean;
 }
 
-export const ValidateFieldMixin: ComponentOptions<Vue> &
-	ThisType<ValidateFieldMixinComponent> = {
+export const ValidateFieldMixin: ComponentOptions<Vue> & ThisType<ValidateFieldMixinComponent> = {
 	inject: {
 		validateManager: {
 			from: VALIDATE_MANAGER_SYMBOL,
@@ -38,30 +34,26 @@ export const ValidateFieldMixin: ComponentOptions<Vue> &
 					this.$validateItem = null;
 				}
 				if (!this.validateManager) return;
-				this.$validateItem = this.validateManager.createItem(
-					this,
-					this,
-					{
-						reset: () => {
-							this.dirty = false;
-						},
-						validate: () => {
-							this.dirty = true;
-						},
-						state$: () => {
-							return watchAsObservable(
-								this,
-								function () {
-									if (!this.dirty) return true;
-									return !!this.isValid;
-								},
-								{
-									immediate: true,
-								}
-							);
-						},
-					}
-				);
+				this.$validateItem = this.validateManager.createItem(this, this, {
+					reset: () => {
+						this.dirty = false;
+					},
+					validate: () => {
+						this.dirty = true;
+					},
+					state$: () => {
+						return watchAsObservable(
+							this,
+							function () {
+								if (!this.dirty) return true;
+								return !!this.isValid;
+							},
+							{
+								immediate: true,
+							}
+						);
+					},
+				});
 			},
 		},
 	},

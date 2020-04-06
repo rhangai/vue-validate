@@ -1,8 +1,5 @@
 import { DirectiveOptions } from "vue/types/options";
-import {
-	ValidateManager,
-	VALIDATE_MANAGER_SYMBOL,
-} from "../manager/ValidateManager";
+import { ValidateManager, VALIDATE_MANAGER_SYMBOL } from "../manager/ValidateManager";
 import { ValidateRulesManager } from "../rules/ValidateRulesManager";
 import { ValidateItem, ValidateItemKey } from "../manager/ValidateItem";
 import { VNode } from "vue";
@@ -10,12 +7,11 @@ import { VNode } from "vue";
 class ValidateDirectiveRulesManager {
 	private rulesManager: ValidateRulesManager;
 	private validateItem: ValidateItem | null;
+	private lastValue: any = null;
 
-	constructor(
-		binding: any,
-		createItem: (rulesManager: ValidateRulesManager) => ValidateItem | null
-	) {
+	constructor(binding: any, createItem: (rulesManager: ValidateRulesManager) => ValidateItem | null) {
 		this.rulesManager = new ValidateRulesManager(binding.value);
+		this.lastValue = binding.value;
 		this.validateItem = createItem(this.rulesManager);
 	}
 
@@ -38,9 +34,7 @@ class ValidateDirectiveRulesManager {
 		return null;
 	}
 
-	static findManager(
-		component: Vue | null | undefined
-	): ValidateManager | null {
+	static findManager(component: Vue | null | undefined): ValidateManager | null {
 		while (component != null) {
 			const instanceValidateManager =
 				// @ts-ignore
@@ -57,43 +51,33 @@ export const ValidateDirectiveRules: DirectiveOptions = {
 		let validateDirective: ValidateDirectiveRulesManager;
 		if (vnode.componentInstance) {
 			const component = vnode.componentInstance;
-			const validateManager = ValidateDirectiveRulesManager.findManager(
-				component
-			);
+			const validateManager = ValidateDirectiveRulesManager.findManager(component);
 			if (!validateManager) return;
-			validateDirective = new ValidateDirectiveRulesManager(
-				binding,
-				(rulesManager) => {
-					return validateManager.createItem(component, component, {
-						reset() {},
-						validate() {},
-						state$: () => {
-							return rulesManager.fromComponent$(component);
-						},
-					});
-				}
-			);
+			validateDirective = new ValidateDirectiveRulesManager(binding, (rulesManager) => {
+				return validateManager.createItem(component, component, {
+					reset() {},
+					validate() {},
+					state$: () => {
+						return rulesManager.fromComponent$(component);
+					},
+				});
+			});
 		} else {
 			const component: Vue | null = ValidateDirectiveRulesManager.findComponent(
 				// @ts-ignore
 				vnode.context?._vnode
 			);
-			const validateManager = ValidateDirectiveRulesManager.findManager(
-				component
-			);
+			const validateManager = ValidateDirectiveRulesManager.findManager(component);
 			if (!component || !validateManager) return;
-			validateDirective = new ValidateDirectiveRulesManager(
-				binding,
-				(rulesManager) => {
-					return validateManager.createItem(el, component, {
-						reset() {},
-						validate() {},
-						state$: () => {
-							return rulesManager.fromElement$(el);
-						},
-					});
-				}
-			);
+			validateDirective = new ValidateDirectiveRulesManager(binding, (rulesManager) => {
+				return validateManager.createItem(el, component, {
+					reset() {},
+					validate() {},
+					state$: () => {
+						return rulesManager.fromElement$(el);
+					},
+				});
+			});
 		}
 		el.validateDirective = validateDirective;
 	},

@@ -1,6 +1,7 @@
 /* eslint 'no-useless-constructor': 'off' */
 import Vue from "vue";
 import { Observable, BehaviorSubject, Subscription } from "rxjs";
+import { distinctUntilChanged } from "rxjs/operators";
 import { ValidateManager } from "./ValidateManager";
 
 export type ValidateItemKey = Vue | HTMLElement;
@@ -28,7 +29,7 @@ export class ValidateItem {
 	) {
 		this.destroy = this.destroy.bind(this);
 		this.component.$once("hook:beforeDestroy", this.destroy);
-		this.subscription = this.options.state$().subscribe(this.state$);
+		this.subscription = this.options.state$().pipe(distinctUntilChanged()).subscribe(this.state$);
 	}
 
 	async validate(): Promise<boolean> {
