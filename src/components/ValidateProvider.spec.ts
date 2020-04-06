@@ -35,7 +35,7 @@ describe("ValidateProvider", () => {
 		expect(childVm.validateManager).toBeInstanceOf(ValidateManager);
 		expect(childVm.parentValidateManager).toBe(parentVm.validateManager);
 
-		await parentVm.reset();
+		await parentVm.resetValidation();
 		expect(await parentVm.validate()).toBe(true);
 
 		wrapper.destroy();

@@ -35,7 +35,7 @@ export const ValidateFieldMixin: ComponentOptions<Vue> & ThisType<ValidateFieldM
 				}
 				if (!this.validateManager) return;
 				this.$validateItem = this.validateManager.createItem(this, this, {
-					reset: () => {
+					resetValidation: () => {
 						this.dirty = false;
 					},
 					validate: () => {

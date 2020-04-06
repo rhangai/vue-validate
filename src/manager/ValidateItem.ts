@@ -7,7 +7,7 @@ import { ValidateManager } from "./ValidateManager";
 export type ValidateItemKey = Vue | HTMLElement;
 export type ValidateItemOptions = {
 	/// Limpa o estado do observável
-	reset: () => unknown | Promise<unknown>;
+	resetValidation: () => unknown | Promise<unknown>;
 	/// Valida o observável
 	validate: () => unknown | Promise<unknown>;
 	/// Pega o estado da validação
@@ -37,8 +37,8 @@ export class ValidateItem {
 		return this.state$.getValue();
 	}
 
-	async reset(): Promise<void> {
-		await this.options.reset();
+	async resetValidation(): Promise<void> {
+		await this.options.resetValidation();
 	}
 
 	observable$() {

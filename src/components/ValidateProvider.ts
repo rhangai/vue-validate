@@ -5,7 +5,7 @@ import { ValidateItem } from "../manager/ValidateItem";
 
 export interface ValidateProvider extends Vue {
 	validate(): Promise<boolean>;
-	reset(): Promise<void>;
+	resetValidation(): Promise<void>;
 }
 
 export interface ValidateProviderVue extends Vue, ValidateProvider {
@@ -58,8 +58,8 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> & ThisType<
 		validate() {
 			return this.validateManager.validate();
 		},
-		reset() {
-			return this.validateManager.reset();
+		resetValidation() {
+			return this.validateManager.resetValidation();
 		},
 		parentValidateManagerRefresh() {
 			if (this.parentValidateItem) {
@@ -68,7 +68,7 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> & ThisType<
 			}
 			if (!this.parentValidateManager || !this.validateManager) return;
 			this.parentValidateItem = this.parentValidateManager.createItem(this, this, {
-				reset: () => this.validateManager.reset(),
+				resetValidation: () => this.validateManager.resetValidation(),
 				validate: () => this.validateManager.validate(),
 				state$: () => this.validateManager.observable$(),
 			});

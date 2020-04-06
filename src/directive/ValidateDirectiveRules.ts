@@ -55,7 +55,7 @@ export const ValidateDirectiveRules: DirectiveOptions = {
 			if (!validateManager) return;
 			validateDirective = new ValidateDirectiveRulesManager(binding, (rulesManager) => {
 				return validateManager.createItem(component, component, {
-					reset() {},
+					resetValidation() {},
 					validate() {},
 					state$: () => {
 						return rulesManager.fromComponent$(component);
@@ -71,7 +71,7 @@ export const ValidateDirectiveRules: DirectiveOptions = {
 			if (!component || !validateManager) return;
 			validateDirective = new ValidateDirectiveRulesManager(binding, (rulesManager) => {
 				return validateManager.createItem(el, component, {
-					reset() {},
+					resetValidation() {},
 					validate() {},
 					state$: () => {
 						return rulesManager.fromElement$(el);

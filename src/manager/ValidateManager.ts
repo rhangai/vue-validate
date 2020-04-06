@@ -30,9 +30,9 @@ export class ValidateManager {
 	/**
 	 * Reset every item form the manager
 	 */
-	async reset(): Promise<void> {
+	async resetValidation(): Promise<void> {
 		const promises: Promise<void | null>[] = [];
-		this.map.forEach((v) => promises.push(v.reset().catch(() => null)));
+		this.map.forEach((v) => promises.push(v.resetValidation().catch(() => null)));
 		await Promise.all(promises);
 	}
 
