@@ -7,14 +7,14 @@ import {
 import { ValidateItem } from "../manager/ValidateItem";
 import { watchAsObservable } from "../util";
 
-export interface IValidateField extends Vue {
+export interface IValidateField {
 	readonly isValid: boolean;
 }
 
 interface ValidateFieldMixinComponent extends Vue, IValidateField {
 	$validateItem: ValidateItem | null;
 	validateManager: ValidateManager;
-	isDirty: boolean;
+	dirty: boolean;
 }
 
 export const ValidateFieldMixin: ComponentOptions<Vue> &
@@ -27,7 +27,7 @@ export const ValidateFieldMixin: ComponentOptions<Vue> &
 	},
 	data() {
 		return {
-			isDirty: false,
+			dirty: false,
 		};
 	},
 	watch: {
@@ -41,16 +41,16 @@ export const ValidateFieldMixin: ComponentOptions<Vue> &
 				if (!this.validateManager) return;
 				this.$validateItem = this.validateManager.createItem(this, {
 					reset: () => {
-						this.isDirty = false;
+						this.dirty = false;
 					},
 					validate: () => {
-						this.isDirty = true;
+						this.dirty = true;
 					},
 					state$: () => {
 						return watchAsObservable(
 							this,
 							function () {
-								if (!this.isDirty) return true;
+								if (!this.dirty) return true;
 								return !!this.isValid;
 							},
 							{
