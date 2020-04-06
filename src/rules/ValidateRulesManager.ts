@@ -3,6 +3,7 @@ import {
 	combineLatest,
 	Observable,
 	asyncScheduler,
+	fromEvent,
 } from "rxjs";
 import { watchAsObservable } from "../util";
 
@@ -34,6 +35,20 @@ export class ValidateRulesManager {
 			},
 			asyncScheduler
 		);
+	}
+
+	fromElement$(element: HTMLElement): Observable<boolean> {
+		const value$ = fromEvent(
+			element,
+			"input",
+			(event) => event.target.value
+		);
+		return combineLatest([this.rules$, value$], (rules, value) => {
+			if (!rules) return true;
+			const result = ValidateRulesManager.doValidateRules(value, rules);
+			if (result === false || Array.isArray(result)) return false;
+			return true;
+		});
 	}
 
 	setRules(rules: ValidateRule[] | ValidateRule | null) {

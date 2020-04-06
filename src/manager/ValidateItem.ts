@@ -3,13 +3,14 @@ import Vue from "vue";
 import { Observable, BehaviorSubject, Subscription } from "rxjs";
 import { ValidateManager } from "./ValidateManager";
 
+export type ValidateItemKey = Vue | HTMLElement;
 export type ValidateItemOptions = {
 	/// Limpa o estado do observável
-	reset: (component: Vue) => unknown | Promise<unknown>;
+	reset: () => unknown | Promise<unknown>;
 	/// Valida o observável
-	validate: (component: Vue) => unknown | Promise<unknown>;
+	validate: () => unknown | Promise<unknown>;
 	/// Pega o estado da validação
-	state$: (component: Vue) => Observable<boolean>;
+	state$: () => Observable<boolean>;
 };
 
 /**
@@ -21,23 +22,22 @@ export class ValidateItem {
 
 	constructor(
 		private readonly validateManager: ValidateManager,
-		public readonly component: Vue,
+		private readonly key: ValidateItemKey,
+		private readonly component: Vue,
 		private readonly options: ValidateItemOptions
 	) {
 		this.destroy = this.destroy.bind(this);
 		this.component.$once("hook:beforeDestroy", this.destroy);
-		this.subscription = this.options
-			.state$(this.component)
-			.subscribe(this.state$);
+		this.subscription = this.options.state$().subscribe(this.state$);
 	}
 
 	async validate(): Promise<boolean> {
-		await this.options.validate(this.component);
+		await this.options.validate();
 		return this.state$.getValue();
 	}
 
 	async reset(): Promise<void> {
-		await this.options.reset(this.component);
+		await this.options.reset();
 	}
 
 	observable$() {
@@ -46,7 +46,7 @@ export class ValidateItem {
 
 	destroy() {
 		this.subscription.unsubscribe();
-		this.validateManager.removeItem(this.component);
+		this.validateManager.removeItem(this.key);
 		this.component.$off("hook:beforeDestroy", this.destroy);
 	}
 }

@@ -38,26 +38,30 @@ export const ValidateFieldMixin: ComponentOptions<Vue> &
 					this.$validateItem = null;
 				}
 				if (!this.validateManager) return;
-				this.$validateItem = this.validateManager.createItem(this, {
-					reset: () => {
-						this.dirty = false;
-					},
-					validate: () => {
-						this.dirty = true;
-					},
-					state$: () => {
-						return watchAsObservable(
-							this,
-							function () {
-								if (!this.dirty) return true;
-								return !!this.isValid;
-							},
-							{
-								immediate: true,
-							}
-						);
-					},
-				});
+				this.$validateItem = this.validateManager.createItem(
+					this,
+					this,
+					{
+						reset: () => {
+							this.dirty = false;
+						},
+						validate: () => {
+							this.dirty = true;
+						},
+						state$: () => {
+							return watchAsObservable(
+								this,
+								function () {
+									if (!this.dirty) return true;
+									return !!this.isValid;
+								},
+								{
+									immediate: true,
+								}
+							);
+						},
+					}
+				);
 			},
 		},
 	},

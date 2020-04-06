@@ -1,5 +1,9 @@
 import { BehaviorSubject, Observable, Subscription, combineLatest } from "rxjs";
-import { ValidateItem, ValidateItemOptions } from "./ValidateItem";
+import {
+	ValidateItem,
+	ValidateItemOptions,
+	ValidateItemKey,
+} from "./ValidateItem";
 export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
 
 /**
@@ -7,7 +11,7 @@ export const VALIDATE_MANAGER_SYMBOL = Symbol("vue-validate-manager");
  */
 export class ValidateManager {
 	private readonly state$ = new BehaviorSubject(true);
-	private readonly map = new Map<Vue, ValidateItem>();
+	private readonly map = new Map<ValidateItemKey, ValidateItem>();
 	private subscription: Subscription | null = null;
 
 	/**
@@ -55,9 +59,18 @@ export class ValidateManager {
 	 * @param component
 	 * @param options
 	 */
-	createItem(component: Vue, options: ValidateItemOptions): ValidateItem {
-		const componentValidate = new ValidateItem(this, component, options);
-		this.map.set(component, componentValidate);
+	createItem(
+		key: ValidateItemKey,
+		component: Vue,
+		options: ValidateItemOptions
+	): ValidateItem {
+		const componentValidate = new ValidateItem(
+			this,
+			key,
+			component,
+			options
+		);
+		this.map.set(key, componentValidate);
 		this.refreshSubscription();
 		return componentValidate;
 	}
@@ -66,8 +79,8 @@ export class ValidateManager {
 	 * Removes the component from validation
 	 * @param component
 	 */
-	removeItem(component: Vue) {
-		if (this.map.delete(component)) this.refreshSubscription();
+	removeItem(key: ValidateItemKey) {
+		if (this.map.delete(key)) this.refreshSubscription();
 	}
 
 	// Refresh the subscription every time this form changes
@@ -89,31 +102,5 @@ export class ValidateManager {
 			...validators,
 			(values) => !values.includes(false)
 		).subscribe(this.state$);
-	}
-
-	/**
-	 * Create a new item on the component
-	 */
-	static createItem(
-		component: Vue | null | undefined,
-		options: ValidateItemOptions
-	): ValidateItem | null {
-		const validateManager = this.findManager(component);
-		if (!validateManager) return null;
-		return validateManager.createItem(component!, options);
-	}
-
-	/// Find the manager on the component
-	static findManager(
-		component: Vue | null | undefined
-	): ValidateManager | null {
-		let currentComponent = component;
-		while (currentComponent != null) {
-			// @ts-ignore
-			const validateManager = currentComponent[VALIDATE_MANAGER_SYMBOL];
-			if (validateManager) return validateManager;
-			currentComponent = currentComponent.$parent;
-		}
-		return null;
 	}
 }

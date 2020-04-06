@@ -76,6 +76,7 @@ export const ValidateProvider: ComponentOptions<ValidateProviderVue> &
 			if (!this.parentValidateManager || !this.validateManager) return;
 			this.parentValidateItem = this.parentValidateManager.createItem(
 				this,
+				this,
 				{
 					reset: () => this.validateManager.reset(),
 					validate: () => this.validateManager.validate(),
